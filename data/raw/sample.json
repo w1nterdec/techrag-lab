@@ -1,0 +1,12 @@
+[
+  {
+    "question": "WSL2 中 docker ps 出现 permission denied",
+    "answer": "这是因为当前用户没有访问 Docker daemon socket 的权限。可以将当前用户加入 docker 用户组，然后重新登录或者重新加载用户组权限。",
+    "category": "docker"
+  },
+  {
+    "question": "如何查看 Linux 端口监听情况",
+    "answer": "可以使用 ss -tlnp 命令查看当前监听的 TCP 端口以及对应进程信息。",
+    "category": "linux"
+  }
+]
