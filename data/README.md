@@ -64,7 +64,7 @@ Example structure:
 
 ## Data Pipeline
 
-The planned workflow:
+The current workflow:
 
 Raw Data
 
@@ -81,17 +81,28 @@ Cleaning
     |
     v
 
+Quality Filtering (inside dedup.py)
+
+    |
+    v
+
 Deduplication
 
     |
     v
 
-Quality Filtering
+Quality Recheck (quality_filter.py)
 
     |
     v
 
 Training Dataset
+
+`dedup.py` reads `cleaned/clean_dataset.json`, applies the existing
+`quality_filter()` before `deduplicate()`, and writes `cleaned/dedup_dataset.json`.
+Deduplication still uses the input text and keeps the first qualified sample for
+identical inputs. `quality_filter.py` rechecks this result and writes
+`cleaned/final_dataset.json`; `build_dataset.py` exports it to `train/train.jsonl`.
 
 
 ---

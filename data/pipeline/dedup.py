@@ -2,6 +2,11 @@ import json
 import hashlib
 from pathlib import Path
 
+if __package__:
+    from .quality_filter import quality_filter
+else:
+    from quality_filter import quality_filter
+
 
 def load_dataset(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -45,7 +50,7 @@ def deduplicate(dataset):
     return results
 
 
-if __name__ == "__main__":
+def main():
 
     input_file = Path(
         "../../data/cleaned/clean_dataset.json"
@@ -58,7 +63,8 @@ if __name__ == "__main__":
 
     dataset = load_dataset(input_file)
 
-    dedup_dataset = deduplicate(dataset)
+    qualified_dataset = quality_filter(dataset)
+    dedup_dataset = deduplicate(qualified_dataset)
 
     save_dataset(
         dedup_dataset,
@@ -68,3 +74,7 @@ if __name__ == "__main__":
     print(
         f"Deduplication completed. Samples: {len(dedup_dataset)}"
     )
+
+
+if __name__ == "__main__":
+    main()
