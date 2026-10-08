@@ -3,6 +3,11 @@ import hashlib
 from pathlib import Path
 
 if __package__:
+    from .validation import validate_standard_dataset
+else:
+    from validation import validate_standard_dataset
+
+if __package__:
     from .quality_filter import quality_filter
 else:
     from quality_filter import quality_filter
@@ -14,6 +19,7 @@ def load_dataset(path):
 
 
 def save_dataset(dataset, path):
+    validate_standard_dataset(dataset)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(
             dataset,
@@ -31,6 +37,7 @@ def generate_hash(text):
 
 
 def deduplicate(dataset):
+    validate_standard_dataset(dataset)
 
     seen = set()
     results = []

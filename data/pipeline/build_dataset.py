@@ -1,6 +1,11 @@
 import json
 from pathlib import Path
 
+if __package__:
+    from .validation import validate_standard_dataset, validate_standard_record, validate_training_dataset
+else:
+    from validation import validate_standard_dataset, validate_standard_record, validate_training_dataset
+
 
 def load_dataset(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -8,6 +13,11 @@ def load_dataset(path):
 
 
 def convert_to_training_format(item):
+    validate_standard_record(item)
+    return _convert_to_training_format(item)
+
+
+def _convert_to_training_format(item):
     return {
         "instruction": item["instruction"],
         "input": item["input"],
@@ -16,12 +26,13 @@ def convert_to_training_format(item):
 
 
 def build_training_dataset(dataset):
+    validate_standard_dataset(dataset)
 
     training_data = []
 
     for item in dataset:
 
-        training_item = convert_to_training_format(item)
+        training_item = _convert_to_training_format(item)
 
         training_data.append(training_item)
 
@@ -29,6 +40,7 @@ def build_training_dataset(dataset):
 
 
 def save_jsonl(dataset, path):
+    validate_training_dataset(dataset)
 
     with open(path, "w", encoding="utf-8") as f:
 

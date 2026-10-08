@@ -1,6 +1,11 @@
 import json
 from pathlib import Path
 
+if __package__:
+    from .validation import validate_standard_dataset
+else:
+    from validation import validate_standard_dataset
+
 
 def load_dataset(path):
 
@@ -10,6 +15,7 @@ def load_dataset(path):
 
 
 def save_dataset(dataset, path):
+    validate_standard_dataset(dataset)
 
     with open(path, "w", encoding="utf-8") as f:
         json.dump(
@@ -48,6 +54,7 @@ def check_quality(item):
 
 
 def quality_filter(dataset):
+    validate_standard_dataset(dataset)
 
     filtered = []
 

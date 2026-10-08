@@ -1,18 +1,47 @@
 {
-  "id": "",
-
-  "instruction": "",
-
-  "input": "",
-
-  "output": "",
-
-  "metadata": {
-    "source": "",
-    "url": "",
-    "category": "",
-    "difficulty": "",
-    "language": "zh",
-    "created_at": ""
-  }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TechRAG-Lab Standard Sample",
+  "type": "object",
+  "required": [
+    "id",
+    "instruction",
+    "input",
+    "output",
+    "metadata"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "instruction": {
+      "type": "string"
+    },
+    "input": {
+      "type": "string"
+    },
+    "output": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "category",
+        "language",
+        "source"
+      ],
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
 }

@@ -18,11 +18,15 @@ def test_generate_hash_distinguishes_text():
 def test_deduplicate_removes_duplicates():
     dataset = [
         {
+            "instruction": "回答问题",
+            "metadata": {"category": "linux", "language": "zh", "source": "manual"},
             "id": "001",
             "input": "What is Docker?",
             "output": "Answer A",
         },
         {
+            "instruction": "回答问题",
+            "metadata": {"category": "linux", "language": "zh", "source": "manual"},
             "id": "002",
             "input": "What is Docker?",
             "output": "Answer B",
@@ -37,8 +41,8 @@ def test_deduplicate_removes_duplicates():
 
 def test_deduplicate_keeps_unique_samples():
     dataset = [
-        {"input": "What is Linux?", "output": "Answer A"},
-        {"input": "What is Docker?", "output": "Answer B"},
+        {"id": "linux", "instruction": "回答问题", "metadata": {"category": "linux", "language": "zh", "source": "manual"}, "input": "What is Linux?", "output": "Answer A"},
+        {"id": "docker", "instruction": "回答问题", "metadata": {"category": "docker", "language": "zh", "source": "manual"}, "input": "What is Docker?", "output": "Answer B"},
     ]
 
     result = deduplicate(dataset)
@@ -56,7 +60,7 @@ def make_entry_sample(sample_id, output):
         "instruction": "回答技术问题",
         "input": "如何查看 Linux 监听端口？",
         "output": output,
-        "metadata": {"category": "linux"},
+        "metadata": {"category": "linux", "language": "zh", "source": "manual"},
     }
 
 

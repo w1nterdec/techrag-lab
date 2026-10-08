@@ -17,10 +17,16 @@ def test_clean_text_handles_none():
 def test_clean_dataset_removes_empty_input():
     dataset = [
         {
+            "id": "sample",
+            "instruction": "回答问题",
+            "metadata": {"category": "linux", "language": "zh", "source": "manual"},
             "input": "",
             "output": "Valid answer",
         },
         {
+            "id": "sample",
+            "instruction": "回答问题",
+            "metadata": {"category": "linux", "language": "zh", "source": "manual"},
             "input": "What is Docker?",
             "output": "Docker is a container platform.",
         },
@@ -35,6 +41,9 @@ def test_clean_dataset_removes_empty_input():
 def test_clean_dataset_removes_empty_output():
     dataset = [
         {
+            "id": "sample",
+            "instruction": "回答问题",
+            "metadata": {"category": "linux", "language": "zh", "source": "manual"},
             "input": "What is Linux?",
             "output": "",
         }
@@ -48,6 +57,9 @@ def test_clean_dataset_removes_empty_output():
 def test_clean_dataset_strips_whitespace():
     dataset = [
         {
+            "id": "sample",
+            "instruction": "回答问题",
+            "metadata": {"category": "linux", "language": "zh", "source": "manual"},
             "input": "  What is WSL2?  ",
             "output": "  A Linux compatibility environment.  ",
         }

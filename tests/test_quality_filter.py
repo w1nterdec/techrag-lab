@@ -10,9 +10,11 @@ def make_sample(
     metadata=None,
 ):
     if metadata is None:
-        metadata = {"category": "linux"}
+        metadata = {"category": "linux", "language": "zh", "source": "manual"}
 
     return {
+        "id": "sample",
+        "instruction": "回答问题",
         "input": input_text,
         "output": output_text,
         "metadata": metadata,
@@ -55,7 +57,7 @@ def test_quality_filter_keeps_only_valid_samples():
         make_sample(),
         make_sample(input_text="Hi"),
         make_sample(output_text="ok"),
-        make_sample(metadata={}),
+        make_sample(input_text=""),
     ]
 
     result = quality_filter(dataset)
