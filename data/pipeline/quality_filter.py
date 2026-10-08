@@ -1,10 +1,18 @@
 import json
-from pathlib import Path
+import sys
 
 if __package__:
     from .validation import validate_standard_dataset
 else:
     from validation import validate_standard_dataset
+
+
+if __package__:
+    from .io_utils import write_standard_json
+    from .paths import parse_stage_args
+else:
+    from io_utils import write_standard_json
+    from paths import parse_stage_args
 
 
 def load_dataset(path):
@@ -15,16 +23,7 @@ def load_dataset(path):
 
 
 def save_dataset(dataset, path):
-    validate_standard_dataset(dataset)
-
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(
-            dataset,
-            f,
-            ensure_ascii=False,
-            indent=2
-        )
-
+    write_standard_json(dataset, path)
 
 
 def check_quality(item):
@@ -68,31 +67,13 @@ def quality_filter(dataset):
 
 
 
-if __name__ == "__main__":
-
-
-    input_file = Path(
-        "../../data/cleaned/dedup_dataset.json"
-    )
-
-
-    output_file = Path(
-        "../../data/cleaned/final_dataset.json"
-    )
-
-
+def main(argv=()):
+    input_file, output_file = parse_stage_args("quality_filter", argv)
     dataset = load_dataset(input_file)
+    result = quality_filter(dataset)
+    save_dataset(result, output_file)
+    print(f"Quality filtering completed. Samples: {len(result)}")
 
 
-    filtered_dataset = quality_filter(dataset)
-
-
-    save_dataset(
-        filtered_dataset,
-        output_file
-    )
-
-
-    print(
-        f"Quality filtering completed. Samples: {len(filtered_dataset)}"
-    )
+if __name__ == "__main__":
+    main(sys.argv[1:])

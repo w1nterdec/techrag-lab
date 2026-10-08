@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from data.pipeline import ingest
+from data.pipeline import ingest, io_utils
 from data.pipeline.validation import DatasetValidationError, validate_standard_dataset
 
 
@@ -51,7 +51,7 @@ def test_generated_standard_data_is_checked_before_open(monkeypatch):
         opened.append(args)
         raise AssertionError("output opened before generated data validation")
 
-    monkeypatch.setattr(ingest, "open", forbidden_open, raising=False)
+    monkeypatch.setattr(io_utils, "_atomic_write", forbidden_open)
     with pytest.raises(DatasetValidationError):
         ingest.build_dataset("unused-input", "unused-output")
     assert opened == []

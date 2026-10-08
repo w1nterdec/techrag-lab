@@ -1,10 +1,18 @@
 import json
-from pathlib import Path
+import sys
 
 if __package__:
     from .validation import validate_standard_dataset, validate_standard_record, validate_training_dataset
 else:
     from validation import validate_standard_dataset, validate_standard_record, validate_training_dataset
+
+
+if __package__:
+    from .io_utils import write_training_jsonl
+    from .paths import parse_stage_args
+else:
+    from io_utils import write_training_jsonl
+    from paths import parse_stage_args
 
 
 def load_dataset(path):
@@ -40,42 +48,16 @@ def build_training_dataset(dataset):
 
 
 def save_jsonl(dataset, path):
-    validate_training_dataset(dataset)
+    write_training_jsonl(dataset, path)
 
-    with open(path, "w", encoding="utf-8") as f:
 
-        for item in dataset:
-
-            f.write(
-                json.dumps(
-                    item,
-                    ensure_ascii=False
-                )
-                + "\n"
-            )
+def main(argv=()):
+    input_file, output_file = parse_stage_args("build_dataset", argv)
+    dataset = load_dataset(input_file)
+    result = build_training_dataset(dataset)
+    save_jsonl(result, output_file)
+    print(f"Training dataset built. Samples: {len(result)}")
 
 
 if __name__ == "__main__":
-
-    input_file = Path(
-        "../../data/cleaned/final_dataset.json"
-    )
-
-    output_file = Path(
-        "../../data/train/train.jsonl"
-    )
-
-    dataset = load_dataset(input_file)
-
-    training_dataset = build_training_dataset(
-        dataset
-    )
-
-    save_jsonl(
-        training_dataset,
-        output_file
-    )
-
-    print(
-        f"Training dataset built. Samples: {len(training_dataset)}"
-    )
+    main(sys.argv[1:])

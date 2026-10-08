@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from data.pipeline import ingest, clean, quality_filter, dedup, build_dataset
+from data.pipeline import ingest, clean, quality_filter, dedup, build_dataset, io_utils
 
 
 def standard():
@@ -43,7 +43,7 @@ def test_save_validates_later_record_before_open(monkeypatch, module, save):
         opened.append(args)
         raise AssertionError("output opened before validation")
 
-    monkeypatch.setattr(module, "open", forbidden_open, raising=False)
+    monkeypatch.setattr(io_utils, "_atomic_write", forbidden_open)
     with pytest.raises(ValueError, match=r"(?:standard|training)\[1\]\.output"):
         save([standard(), bad], "unused-output")
     assert opened == []
@@ -60,7 +60,7 @@ def test_ingest_validates_before_output_open(monkeypatch, bad):
         opened.append(args)
         raise AssertionError("output opened before validation")
 
-    monkeypatch.setattr(ingest, "open", forbidden_open, raising=False)
+    monkeypatch.setattr(io_utils, "_atomic_write", forbidden_open)
     with pytest.raises(ValueError, match=r"raw\[1\]\.answer"):
         ingest.build_dataset("unused-input", "unused-output")
     assert opened == []

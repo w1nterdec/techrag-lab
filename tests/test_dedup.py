@@ -68,11 +68,11 @@ def capture_main_output(monkeypatch, dataset):
     saved = []
 
     def fake_load(path):
-        assert path == Path("../../data/cleaned/clean_dataset.json")
+        assert path == Path(__file__).resolve().parents[1] / "data/cleaned/clean_dataset.json"
         return dataset
 
     def fake_save(records, path):
-        assert path == Path("../../data/cleaned/dedup_dataset.json")
+        assert path == Path(__file__).resolve().parents[1] / "data/cleaned/dedup_dataset.json"
         saved.append(records)
 
     monkeypatch.setattr(dedup, "load_dataset", fake_load)

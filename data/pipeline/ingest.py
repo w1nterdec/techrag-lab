@@ -1,11 +1,19 @@
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
 
 if __package__:
     from .validation import validate_raw_dataset, validate_raw_record, validate_standard_dataset
 else:
     from validation import validate_raw_dataset, validate_raw_record, validate_standard_dataset
+
+
+if __package__:
+    from .io_utils import write_standard_json
+    from .paths import parse_stage_args
+else:
+    from io_utils import write_standard_json
+    from paths import parse_stage_args
 
 
 def load_raw_data(path):
@@ -33,37 +41,23 @@ def _convert_to_schema(item, index):
     }
 
 
-def build_dataset(raw_path, output_path):
-
-    raw_data = load_raw_data(raw_path)
+def ingest_records(raw_data):
     validate_raw_dataset(raw_data)
-
-    dataset = []
-
-    for idx, item in enumerate(raw_data):
-        dataset.append(
-            _convert_to_schema(item, idx)
-        )
-
+    dataset = [_convert_to_schema(item, index) for index, item in enumerate(raw_data)]
     validate_standard_dataset(dataset)
+    return dataset
 
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(
-            dataset,
-            f,
-            ensure_ascii=False,
-            indent=2
-        )
+
+def build_dataset(raw_path, output_path):
+    dataset = ingest_records(load_raw_data(raw_path))
+    write_standard_json(dataset, output_path)
+
+
+def main(argv=()):
+    input_file, output_file = parse_stage_args("ingest", argv)
+    build_dataset(input_file, output_file)
+    print("Dataset ingestion completed.")
 
 
 if __name__ == "__main__":
-
-    raw_file = Path("../../data/raw/sample.json")
-    output_file = Path("../../data/cleaned/dataset.json")
-
-    build_dataset(
-        raw_file,
-        output_file
-    )
-
-    print("Dataset ingestion completed.")
+    main(sys.argv[1:])

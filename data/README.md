@@ -55,7 +55,8 @@ Example structure:
   "output": "The user does not have permission to access Docker daemon socket.",
   "metadata": {
     "category": "docker",
-    "language": "zh"
+    "language": "zh",
+    "source": "manual"
   }
 }
 
@@ -149,8 +150,76 @@ existing minimum lengths of 5 input characters and 10 output characters after
 stripping whitespace. Pre-filtering before deduplication and the final quality
 recheck remain in place.
 
-Validation does not provide atomic writes or remove the scripts' existing
-working-directory-dependent input/output paths.
+Structural validation runs before atomic output creation. Default data paths are
+now resolved from the pipeline modules' location rather than the working directory.
+
+---
+
+
+## Execution and Atomic Outputs
+
+The five standalone stages remain available as modules or direct scripts. They
+share `--input` and `--output` options. Defaults refer to the same files under
+this repository's `data/` directory, regardless of the current working directory.
+Explicit relative paths are resolved against the caller's working directory.
+Calling a stage's `main()` without arguments uses defaults; command-line entry
+points pass their arguments explicitly.
+
+For isolated execution from the repository root:
+
+```bash
+python -m data.pipeline.ingest --input /tmp/raw.json --output /tmp/techrag/dataset.json
+python -m data.pipeline.clean --input /tmp/techrag/dataset.json --output /tmp/techrag/clean.json
+python -m data.pipeline.dedup --input /tmp/techrag/clean.json --output /tmp/techrag/dedup.json
+python -m data.pipeline.quality_filter --input /tmp/techrag/dedup.json --output /tmp/techrag/final.json
+python -m data.pipeline.build_dataset --input /tmp/techrag/final.json --output /tmp/techrag/train.jsonl
+```
+
+The unified entry point loads Raw JSON once, passes data in memory through
+Ingest → Clean → Quality Pre-filter → Dedup → Quality Recheck → Training Build,
+and atomically publishes only `<output-dir>/train.jsonl`. It does not generate
+or read intermediate JSON artifacts. `ingest_records()` provides the in-memory
+Raw-to-Standard conversion; `build_dataset(raw_path, output_path)` remains available.
+
+```bash
+python -m data.pipeline.run_pipeline --input /tmp/raw.json --output-dir /tmp/techrag-output
+```
+
+`--input` is optional and defaults to this repository's `data/raw/sample.json`.
+`--output-dir` is required: omitting it exits with an argument error and does not
+fall back to the formal training directory. Existing output files are replaced
+on a successful run. There are no dry-run or report-file options.
+
+From another working directory, direct stage scripts can be invoked by absolute
+path. For `python -m`, the repository must be on Python's import path, for example:
+
+```bash
+PYTHONPATH=/path/to/techrag-lab /path/to/venv/bin/python -m data.pipeline.run_pipeline --input /tmp/raw.json --output-dir /tmp/techrag-output
+```
+
+The runner emits a JSON report to stdout on success and stderr on pipeline failure.
+Its exit status is 0 on success, 1 on pipeline failure, and 2 for argument errors.
+The report includes six stages' input/output sample counts, elapsed seconds and
+status (`completed`, `failed`, `not_run`), plus the failed operation and original
+exception type/message. Counts are null when unavailable. A failed Training save
+can include `built_count` while `output_count` remains null. Training timing includes
+building and saving. `output_committed` becomes true only after final replacement.
+Programmatic `run_pipeline(input_path, output_dir)` returns the report or raises
+`PipelineExecutionError` with `.stage`, `.report` and the original exception as
+`__cause__`. Dataset validation failures retain `index`, `field`, `layer` in the report.
+
+`io_utils.py` performs complete structure validation before creating directories
+or temporary files. JSON and JSONL keep their existing serialization formats.
+A uniquely named temporary file is created in the target directory, written,
+flushed, fsynced and closed before `os.replace()` publishes it. Serialization and
+I/O failures leave the old target unchanged and attempt temporary-file cleanup.
+Cleanup failures are attached as notes to the original exception; they do not
+replace it. Such failures can leave a temporary file for manual cleanup.
+
+This guarantees atomic replacement of one file, not a transaction across the
+standalone stages' multiple outputs. It does not guarantee full power-loss
+durability, concurrent-run coordination, or preservation of target permissions,
+ACLs or symbolic-link behavior. Forced termination may leave temporary files.
 
 ---
 

@@ -1,10 +1,18 @@
 import json
-from pathlib import Path
+import sys
 
 if __package__:
     from .validation import validate_standard_dataset
 else:
     from validation import validate_standard_dataset
+
+
+if __package__:
+    from .io_utils import write_standard_json
+    from .paths import parse_stage_args
+else:
+    from io_utils import write_standard_json
+    from paths import parse_stage_args
 
 
 def load_dataset(path):
@@ -41,31 +49,16 @@ def clean_dataset(dataset):
 
 
 def save_dataset(dataset, path):
-    validate_standard_dataset(dataset)
+    write_standard_json(dataset, path)
 
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(
-            dataset,
-            f,
-            ensure_ascii=False,
-            indent=2
-        )
+
+def main(argv=()):
+    input_file, output_file = parse_stage_args("clean", argv)
+    dataset = load_dataset(input_file)
+    result = clean_dataset(dataset)
+    save_dataset(result, output_file)
+    print(f"Cleaning completed. Samples: {len(result)}")
 
 
 if __name__ == "__main__":
-
-    input_file = Path("../../data/cleaned/dataset.json")
-    output_file = Path("../../data/cleaned/clean_dataset.json")
-
-    dataset = load_dataset(input_file)
-
-    cleaned_dataset = clean_dataset(dataset)
-
-    save_dataset(
-        cleaned_dataset,
-        output_file
-    )
-
-    print(
-        f"Cleaning completed. Samples: {len(cleaned_dataset)}"
-    )
+    main(sys.argv[1:])
