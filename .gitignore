@@ -11,3 +11,17 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+
+# Model checkpoints
+*.pt
+*.pth
+*.ckpt
+
+# Experiment outputs
+outputs/
