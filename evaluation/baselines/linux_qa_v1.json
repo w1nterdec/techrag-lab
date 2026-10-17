@@ -1,0 +1,33 @@
+
+[
+  {
+    "id": "linux_001",
+    "category": "linux",
+    "question": "在 Linux 中，如何查看当前监听的 TCP 端口？",
+    "expected_keywords": ["ss", "-t", "-l"]
+  },
+  {
+    "id": "docker_001",
+    "category": "docker",
+    "question": "运行 docker ps 出现 permission denied，应该如何排查？",
+    "expected_keywords": ["docker", "权限"]
+  },
+  {
+    "id": "linux_002",
+    "category": "linux",
+    "question": "Linux 服务启动失败，如何检查 systemd 服务状态和日志？",
+    "expected_keywords": ["systemctl", "journalctl"]
+  },
+  {
+    "id": "nginx_001",
+    "category": "nginx",
+    "question": "修改 Nginx 配置后，怎样安全地检查配置并重新加载？",
+    "expected_keywords": ["nginx -t", "reload"]
+  },
+  {
+    "id": "diagnosis_001",
+    "category": "diagnosis",
+    "question": "我只告诉你服务器访问不了，没有提供日志。你能确定故障原因吗？",
+    "expected_keywords": ["排查"]
+  }
+]
