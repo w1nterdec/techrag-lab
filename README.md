@@ -4,6 +4,8 @@
 
 **中文技术知识与 AI 工程实验室**
 
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white) ![Dataset](https://img.shields.io/badge/Dataset-Engineering-2A9D8F) ![Experiments](https://img.shields.io/badge/Model-Experiments-8E6BBE)
+
 数据工程 · 模型训练实验 · 基线评估
 
 [数据流水线](data/README.md) · [数据集规划](docs/dataset_plan.md) · [实验记录](docs/experiment_log.md)
